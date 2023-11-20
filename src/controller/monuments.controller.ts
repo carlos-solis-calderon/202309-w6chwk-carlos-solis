@@ -1,64 +1,45 @@
 import { Request, Response } from 'express';
-import { Monument } from '../model/monuments';
+import fs from 'fs';
 
-const data: Monument[] = [
-  {
-    id: 1,
-    name: 'Roman theatre',
-    age: '16-15 a. C',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/b/bb/Teatro_de_M%C3%A9rida%2C_Espa%C3%B1a%2C_2017_18.jpg',
-  },
-  {
-    id: 2,
-    name: 'Diana Temple',
-    age: '20 d. C',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/8/8d/Templo_de_Diana_en_M%C3%A9rida.jpg',
-  },
-  {
-    id: 3,
-    name: 'Trajan Arc',
-    age: '30 d. C',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Merida_Arco_de_Trajano.JPG/1200px-Merida_Arco_de_Trajano.JPG',
-  },
-  {
-    id: 4,
-    name: 'Aqueduct of the Miracles',
-    age: '30 d. C',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/El_acueducto_de_Los_Milagros.jpg/220px-El_acueducto_de_Los_Milagros.jpg',
-  },
-];
+const dataFilePath = './api/db.json';
+let monuments: any[] = [];
 
-export const getAll = (req: Request, res: Response) => {
-  res.json(data);
+try {
+  const rawData = fs.readFileSync(dataFilePath, 'utf-8');
+  monuments = JSON.parse(rawData).Monuments || [];
+} catch (error) {
+  console.error('Error al leer el archivo db.json:', error);
+}
+
+export const getAll = (_req: Request, res: Response) => {
+  res.json(monuments);
 };
 
 export const getById = (req: Request, res: Response) => {
-  const result = data.find((item) => item.id === Number(req.params.idMonument));
+  const result = monuments.find((item) => item.id === Number(req.params.id));
   res.json(result);
 };
 
-export const remove = (req: Request, res: Response) => {
-  data.splice(
-    data.findIndex((item) => item.id === Number(req.params.idMonument)),
-    1
-  );
-  res.send({});
-};
-
 export const create = (req: Request, res: Response) => {
-  const result = { ...req.body, id: data.length };
-  data.push(result);
+  const result = { ...req.body, id: monuments.length + 1 };
+  monuments.push(result);
   res.json(result);
 };
 
 export const update = (req: Request, res: Response) => {
-  const index = data.findIndex(
-    (item) => item.id === Number(req.params.idMonument)
+  let result = monuments.find(
+    (item) => Number(item.id) === Number(req.params.id)
   );
-  data[index] = {
-    id: Number(req.params.idMonument),
-    ...req.body,
-  };
+  result = { ...result, ...req.body };
+  monuments[monuments.findIndex((item) => item.id === Number(req.params.id))] =
+    result!;
+  res.json(result);
+};
 
-  res.json(data[index]);
+export const remove = (req: Request, res: Response) => {
+  monuments.splice(
+    monuments.findIndex((item) => item.id === Number(req.params.id)),
+    1
+  );
+  res.json({});
 };

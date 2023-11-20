@@ -7,10 +7,10 @@ import {
   update,
 } from '../controller/monuments.controller.js';
 
-export const filmsRouter = createRouter();
+export const monumentsRouter = createRouter();
 
-filmsRouter.get('/', getAll);
-filmsRouter.get('/:id', getById);
-filmsRouter.post('/', create);
-filmsRouter.patch('/:id', update);
-filmsRouter.delete('/:id', remove);
+monumentsRouter.get('/', getAll);
+monumentsRouter.get('/:id', getById);
+monumentsRouter.post('/', create);
+monumentsRouter.patch('/:id', update);
+monumentsRouter.delete('/:id', remove);
